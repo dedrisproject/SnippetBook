@@ -197,6 +197,67 @@
 
       loadSnippets();
     }
+
+    function exportSnippets() {
+  var snippets = JSON.parse(localStorage.getItem("snippets"));
+
+  // Verifica se ci sono snippet da esportare
+  if (snippets && snippets.length > 0) {
+    var data = JSON.stringify(snippets);
+    var blob = new Blob([data], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+
+    // Crea un elemento <a> per il download del file JSON
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = "snippets.json";
+
+    // Simula il click sul link per avviare il download
+    link.click();
+
+    // Rilascia la risorsa URL creata
+    URL.revokeObjectURL(url);
+  }
+}
+ 
+
+function importSnippets() {
+  var fileInput = document.getElementById("importSnippetInput");
+  var file = fileInput.files[0];
+
+  if (file) {
+    var reader = new FileReader();
+
+    reader.onload = function (event) {
+      var contents = event.target.result;
+      var snippets = JSON.parse(contents);
+
+      if (snippets && Array.isArray(snippets) && snippets.length > 0) {
+        // Salva gli snippet importati nel localStorage
+        localStorage.setItem("snippets", JSON.stringify(snippets));
+
+        // Esegui altre azioni dopo l'importazione degli snippet
+        loadSnippets(); // Aggiorna la visualizzazione degli snippet, ad esempio
+
+        console.log("Importazione degli snippet completata con successo.");
+        $('#importSnippetModal').modal('hide'); // Chiudi la modal dopo l'importazione
+      } else {
+        console.log("File JSON non valido o senza dati degli snippet.");
+      }
+    };
+
+    reader.onerror = function (event) {
+      console.error("Errore durante la lettura del file:", event.target.error);
+    };
+
+    reader.readAsText(file);
+  }
+}
+
+function openImportModal() {
+  $('#importSnippetModal').modal('show');
+}
+
   </script>
 </head>
 <body>
@@ -250,10 +311,32 @@
     </div>
   </div>
 
+  <div class="modal" id="importSnippetModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Importa Snippet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="file" id="importSnippetInput" accept=".json" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+          <button type="button" class="btn btn-primary" onclick="importSnippets()">Importa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
   <div class="sidemenu">
     <div style="text-align: center">
-      <button class="btn btn-primary btn-small" onclick="addsnippet()">Aggiungi Snippet</button>
+      <button type="button" class="btn btn-primary btn-small" onclick="addsnippet()">Aggiungi Snippet</button>
       <div class="snippetlist"></div>
+      <button type="button" class="btn btn-primary btn-small" onclick="exportSnippets()">Esporta DB Snippet</button>
+      <button type="button" class="btn btn-primary btn-small" onclick="openImportModal()">Importa DB Snippet</button>
+
     </div>
   </div>
   <button id="copyButton">Copia negli appunti</button>
