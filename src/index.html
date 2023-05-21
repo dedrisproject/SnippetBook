@@ -94,7 +94,7 @@
       $(".snippet_li").eq(index).click();
     }
 
-    function loadSnippets() {
+    /*function loadSnippets() {
       var snippets;
 
       if (localStorage.getItem("snippets") === null) {
@@ -144,6 +144,110 @@
         sidemenu.append(menuItem);
       });
     }
+*/
+function loadSnippets() {
+  var snippets;
+
+  if (localStorage.getItem("snippets") === null) {
+    snippets = [];
+  } else {
+    snippets = JSON.parse(localStorage.getItem("snippets"));
+  }
+
+  var sidemenu = $(".snippetlist");
+  sidemenu.empty(); // Rimuovi eventuali elementi esistenti nel menu
+
+  // Oggetto per raggruppare gli snippet per linguaggio
+  var snippetGroups = {};
+
+  snippets.forEach(function (snippet, index) {
+    // Aggiungi lo snippet al gruppo corrispondente al linguaggio
+    if (!snippetGroups[snippet.language]) {
+      snippetGroups[snippet.language] = [];
+    }
+    snippetGroups[snippet.language].push(snippet);
+  });
+
+  // Creazione delle voci nel menu laterale per ogni gruppo di snippet
+  Object.keys(snippetGroups).forEach(function (language) {
+    var snippetGroup = snippetGroups[language];
+
+    // Creazione della voce principale per il linguaggio
+    var listItem = $('<div class="snippet_group">');
+    var groupTitle = $('<div class="group_title">Snippet ' + getLanguageName(language) + '</div>');
+    var expandButton = $('<button class="expand_button">+</button>');
+
+    expandButton.click(function () {
+      listItem.toggleClass("expanded");
+    });
+
+    listItem.append(groupTitle);
+    listItem.append(expandButton);
+
+    // Creazione dell'elenco di snippet per il linguaggio
+    var snippetList = $('<div class="snippet_sublist">');
+    snippetGroup.forEach(function (snippet, index) {
+      var snippetItem = $('<div class="snippet_li">').text(snippet.name);
+      var editIcon = $('<img class="edit-icon" src="svgicons/edit.svg">');
+
+      snippetItem.append(editIcon);
+
+      snippetItem.click(function () {
+        var maincontent = $(".maincontent");
+        maincontent.empty();
+        // Inserimento del codice nello snippet nel contenuto principale e applicazione dell'evidenziazione sintattica
+        var codeElement = $("<code>")
+          .addClass(snippet.language)
+          .text(snippet.code);
+        maincontent.append(codeElement);
+        Prism.highlightElement(codeElement[0]);
+
+        // Mostra il pulsante "Copia negli appunti" e associa la funzione copyToClipboard() al clic
+        $("#copyButton")
+          .show()
+          .off("click")
+          .click(function () {
+            copyToClipboard(snippet.code);
+          });
+      });
+
+      editIcon.click(function (e) {
+        e.stopPropagation(); // Evita che l'evento di clic sulla voce dello snippet venga catturato dall'icona di modifica
+        openEditSnippet(index);
+      });
+
+      snippetList.append(snippetItem);
+    });
+
+    listItem.append(snippetList);
+    sidemenu.append(listItem);
+  });
+}
+
+
+
+function getLanguageName(language) {
+  switch (language) {
+    case "language-javascript":
+      return "JavaScript";
+    case "language-html":
+      return "HTML";
+    case "language-css":
+      return "CSS";
+    case "language-php":
+      return "PHP";
+    case "language-python":
+      return "Python";
+    case "language-nodejs":
+      return "Node.js";
+    case "language-sql":
+      return "SQL";
+    default:
+      return language;
+  }
+}
+
+
 
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(
@@ -156,18 +260,24 @@
       );
     }
 
-    function getMonacoLanguage(language) {
+    function getLanguageDisplayName(language) {
       switch (language) {
         case "language-javascript":
-          return "javascript";
+          return "JavaScript";
         case "language-html":
-          return "html";
+          return "HTML";
         case "language-css":
-          return "css";
+          return "CSS";
         case "language-php":
-          return "php";
+          return "PHP";
+        case "language-python":
+          return "Python";
+        case "language-nodejs":
+          return "Node.js";
+        case "language-sql":
+          return "SQL";
         default:
-          return "plaintext"; // Default to plain text for unknown languages
+          return "Altro"; // Default to "Altro" for unknown languages
       }
     }
 
@@ -271,6 +381,32 @@ function importSnippets() {
     reader.readAsText(file);
   }
 }
+
+$(document).ready(function () {
+  // ...
+
+  // Aggiungi l'evento di click al pulsante di espansione
+  $(".group_title").click(function () {
+    // Trova il sottolista associato al pulsante di espansione
+    var sublist = $(this).next(".snippet_sublist");
+    var expandButton = $(this).find(".expand_button");
+
+    // Controlla se il sottolista è visibile o nascosto
+    if (sublist.is(":visible")) {
+      // Il sottolista è visibile, quindi lo nascondiamo
+      sublist.hide();
+      expandButton.text("+"); // Aggiorna il testo del pulsante a "+"
+    } else {
+      // Il sottolista è nascosto, quindi lo mostriamo
+      sublist.show();
+      expandButton.text("-"); // Aggiorna il testo del pulsante a "-"
+    }
+  });
+
+  // ...
+});
+
+
 
 function openImportModal() {
   $('#importSnippetModal').modal('show');

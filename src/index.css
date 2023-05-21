@@ -195,3 +195,65 @@ code {
   font-size: 13px !important;
 }
 
+/* CSS per il menu laterale */
+/* CSS per il menu laterale */
+.sidemenu {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  padding: 10px;
+  width: 250px;
+  height: 100%;
+}
+
+.snippet_group {
+  margin-bottom: 10px;
+}
+
+.group_title {
+  font-weight: bold;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.expand_button {
+  float: right;
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.snippet_sublist {
+  margin-left: 15px;
+  display: none;
+}
+
+.snippet_group.expanded .snippet_sublist {
+  display: block;
+}
+
+
+.expand_button.expanded {
+  content: "-";
+}
+
+.snippet_sublist {
+  border-bottom: 1px solid #494949;
+  padding-bottom: 20px;
+}
+
+.snippetlist {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+button.expand_button {
+  margin-top: -26px !important;
+  background: #1e1e1e !important;
+  border: 0px !important;
+}
+
+img {
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+}
