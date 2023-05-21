@@ -1,0 +1,129 @@
+html {
+  height: 100%;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: #cccccc;
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+}
+
+.sidemenu {
+  float: left;
+  width: 30%;
+  background: #181818;
+  height: 100%;
+  max-width: 310px;
+  border-right: 1px solid #303030;
+}
+
+.btn-small {
+  font-size: 12px !important;
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.maincontent {
+  float: left;
+  width: 70%;
+  background: #1f1f1f;
+  height: 100%;
+}
+
+.modal-body textarea {
+  width: 100%;
+  height: 200px;
+}
+
+.snippet_li {
+  color: #ccc;
+  padding-left: 20px;
+  padding-top: 15px;
+  cursor: pointer;
+}
+
+.snippetlist {
+  text-align: left;
+  font-size: 13px;
+}
+
+code {
+  white-space: pre !important;
+  width: 100% !important;
+  padding: 20px !important;
+  display: block;
+  height: 100%;
+  font-size: 14px;
+  border: 0px !important;
+  background: #1f1f1f !important;
+}
+
+.maincontent {
+  position: relative;
+}
+
+#copyButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: none;
+  z-index: 9;
+  border: 0px;
+  background: #0d6efd;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 5px;
+}
+
+.modal-header {
+  padding: 10px !important;
+}
+
+.modal-header {
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.modal-body {
+  background: #181818;
+}
+
+.snippet_li {
+  position: relative;
+}
+
+.edit-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+code {
+  border-radius: 0px !important;
+  box-shadow: unset !important;
+}
+
+.modal-content {
+  background: #1f1f1f !important;
+}
+svg {
+  fill: #ccc !important;
+  stroke: #ccc !important;
+}
+.icon-tabler-edit {
+  fill: #ccc;
+  stroke: #ccc;
+}
+
+.snippet-editor {
+  width: 100%;
+  height: 300px;
+}

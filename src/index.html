@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>SnippetBook</title>
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="css/prism.css" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <script type="text/javascript" src="js/jquery-3.7.0.min.js"></script>
+  <script type="text/javascript" src="js/prism.js"></script>
+  <script type="text/javascript" src="js/bootstrap.bundle.js"></script>
+  <script type="text/javascript" src="editor/loader.js"></script>
+  <script type="text/javascript" src="editor/basic-languages/php/php.js"></script>
+  <script>
+    require.config({ paths: { 'vs': 'editor' } });
+
+    var editorAdd;
+    var editorEdit;
+
+    require(['vs/editor/editor.main'], function() {
+      editorAdd = monaco.editor.create(document.getElementById('snippetInputAdd'), {
+        value: "",
+        language: 'javascript',
+        automaticLayout: true
+      });
+
+      editorEdit = monaco.editor.create(document.getElementById('snippetInputEdit'), {
+        value: "",
+        language: 'javascript',
+        automaticLayout: true
+      });
+    });
+
+    $("#editsnippet").on("show.bs.modal", function () {
+      var index = $(this).data("index");
+      var snippets = JSON.parse(localStorage.getItem("snippets"));
+      var snippet = snippets[index];
+      editorEdit.setValue(snippet.code); // Utilizza il metodo setValue() dell'editor Monaco
+    });
+
+    function addsnippet() {
+      $("#addsnippet").modal("show");
+    }
+
+    function openEditSnippet(index) {
+      var snippets = JSON.parse(localStorage.getItem("snippets"));
+      var snippet = snippets[index];
+
+      // Imposta i valori correnti dello snippet nei campi del modulo
+      $("#editsnippet #snippetNameInput").val(snippet.name);
+      $("#editsnippet #snippetLanguageInput").val(snippet.language);
+      editorEdit.setValue(snippet.code); // Utilizza il metodo setValue() dell'editor Monaco
+
+      // Memorizza l'indice dello snippet che stiamo modificando
+      $("#editsnippet").data("index", index);
+
+      // Mostra la modale di modifica
+      $("#editsnippet").modal("show");
+    }
+
+    function saveEditSnippet() {
+      var index = $("#editsnippet").data("index");
+      var snippets = JSON.parse(localStorage.getItem("snippets"));
+
+      snippets[index].name = $("#editsnippet #snippetNameInput").val();
+      snippets[index].language = $("#editsnippet #snippetLanguageInput").val();
+      snippets[index].code = editorEdit.getValue(); // Utilizza il metodo getValue() dell'editor Monaco
+
+      localStorage.setItem("snippets", JSON.stringify(snippets));
+
+      $("#editsnippet").modal("hide");
+
+      loadSnippets();
+
+      // Select the updated snippet in the sidemenu
+      $(".snippet_li").eq(index).click();
+    }
+
+    function loadSnippets() {
+      var snippets;
+
+      if (localStorage.getItem("snippets") === null) {
+        snippets = [];
+      } else {
+        snippets = JSON.parse(localStorage.getItem("snippets"));
+      }
+
+      var sidemenu = $(".snippetlist");
+      sidemenu.empty(); // Remove any existing elements in the menu
+
+      snippets.forEach(function (snippet, index) {
+        // Create a new menu item for each snippet
+        var menuItem = $('<div class="snippet_li">').text(snippet.name);
+        var editIcon = $("<img>")
+          .addClass("edit-icon")
+          .attr("src", "svgicons/edit.svg");
+
+        menuItem.click(function () {
+          var maincontent = $(".maincontent");
+          maincontent.empty();
+          // Insert the snippet into the main content and apply the syntax highlight
+          var codeElement = $("<code>")
+            .addClass(snippet.language)
+            .text(snippet.code);
+          maincontent.append(codeElement);
+          Prism.highlightElement(codeElement[0]);
+
+          // Show the "Copy to Clipboard" button and associate the copyToClipboard() function to the click
+          $("#copyButton")
+            .show()
+            .off("click")
+            .click(function () {
+              copyToClipboard(snippet.code);
+            });
+        });
+
+        // Adding the click event to the editIcon.
+        editIcon.click(function (e) {
+          e.stopPropagation(); // Avoids the click event from being captured by the menuItem
+          openEditSnippet(index);
+        });
+
+        // Adding the editIcon to the menuItem.
+        menuItem.append(editIcon);
+
+        sidemenu.append(menuItem);
+      });
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(
+        function () {
+          console.log("Copying to clipboard was successful!");
+        },
+        function (err) {
+          console.error("Could not copy text: ", err);
+        }
+      );
+    }
+
+    function getMonacoLanguage(language) {
+      switch (language) {
+        case "language-javascript":
+          return "javascript";
+        case "language-html":
+          return "html";
+        case "language-css":
+          return "css";
+        case "language-php":
+          return "php";
+        default:
+          return "plaintext"; // Default to plain text for unknown languages
+      }
+    }
+
+    $(document).ready(function () {
+      function adjustMainContentWidth() {
+        var windowWidth = $(window).width();
+        var sidemenuWidth = $(".sidemenu").outerWidth();
+        $(".maincontent").width(windowWidth - sidemenuWidth);
+      }
+
+      loadSnippets();
+
+      // Call when page is loaded
+      adjustMainContentWidth();
+
+      // Call when window is resized
+      $(window).resize(adjustMainContentWidth);
+    });
+
+    function saveAddSnippet() {
+      var snippetName = $("#addsnippet #snippetNameInput").val();
+      var snippetLanguage = $("#addsnippet #snippetLanguageInput").val();
+      var snippetCode = editorAdd.getValue(); // Utilizza il metodo getValue() dell'editor Monaco
+
+      // Create a new snippet object
+      var newSnippet = {
+        name: snippetName,
+        language: snippetLanguage,
+        code: snippetCode,
+      };
+
+      var snippets;
+
+      if (localStorage.getItem("snippets") === null) {
+        snippets = [];
+      } else {
+        snippets = JSON.parse(localStorage.getItem("snippets"));
+      }
+
+      snippets.push(newSnippet);
+
+      localStorage.setItem("snippets", JSON.stringify(snippets));
+
+      $("#addsnippet").modal("hide");
+
+      loadSnippets();
+    }
+  </script>
+</head>
+<body>
+  <div class="modal" id="addsnippet" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Aggiungi Snippet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="snippetNameInput" placeholder="Nome Snippet"/><br />
+          <select id="snippetLanguageInput">
+            <option value="language-javascript">JavaScript</option>
+            <option value="language-html">HTML</option>
+            <option value="language-css">CSS</option>
+            <option value="language-php">PHP</option>
+          </select><br />
+          <div id="snippetInputAdd" class="snippet-editor"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+          <button type="button" onclick="saveAddSnippet()" class="btn btn-primary">Salva Snippet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="editsnippet" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modifica Snippet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="snippetNameInput" placeholder="Nome Snippet"/><br />
+          <select id="snippetLanguageInput">
+            <option value="language-javascript">JavaScript</option>
+            <option value="language-html">HTML</option>
+            <option value="language-css">CSS</option>
+            <option value="language-php">PHP</option>
+          </select><br />
+          <div id="snippetInputEdit" class="snippet-editor"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+          <button type="button" onclick="saveEditSnippet()" class="btn btn-primary">Salva Modifiche</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidemenu">
+    <div style="text-align: center">
+      <button class="btn btn-primary btn-small" onclick="addsnippet()">Aggiungi Snippet</button>
+      <div class="snippetlist"></div>
+    </div>
+  </div>
+  <button id="copyButton">Copia negli appunti</button>
+  <div class="maincontent"></div>
+</body>
+</html>
