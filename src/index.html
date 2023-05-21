@@ -298,6 +298,9 @@ function openImportModal() {
             <option value="language-html">HTML</option>
             <option value="language-css">CSS</option>
             <option value="language-php">PHP</option>
+            <option value="language-python">Python</option>
+            <option value="language-nodejs">NodeJs</option>
+            <option value="language-sql">Sql</option>
           </select>
         </div>
         </div class="editorcontainer">
@@ -319,15 +322,26 @@ function openImportModal() {
           
         </div>
         <div class="modal-body">
-          <input type="text" id="snippetNameInput" class="form-control" placeholder="Nome Snippet"/><br />
-          <select id="snippetLanguageInput" class="form-control">
+          <div class="inputcontainer">
+            <div>
+              <input type="text" id="snippetNameInput" class="form-control" placeholder="Nome Snippet"/>
+            </div>
+            <div>
+            <select id="snippetLanguageInput" class="form-control">
             <option value="language-javascript">JavaScript</option>
             <option value="language-html">HTML</option>
             <option value="language-css">CSS</option>
             <option value="language-php">PHP</option>
-          </select><br />
+            <option value="language-python">Python</option>
+            <option value="language-nodejs">NodeJs</option>
+            <option value="language-sql">Sql</option>
+            </select>
+            </div>
+        </div>
+        <div class="editorcontainer">
           <div id="snippetInputEdit" class="snippet-editor"></div>
         </div>
+      </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-small" data-bs-dismiss="modal">Chiudi</button>
           <button type="button" onclick="saveEditSnippet()" class="btn btn-primary btn-small">Salva Modifiche</button>
